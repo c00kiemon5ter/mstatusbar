@@ -1,0 +1,6 @@
+mstatusbar
+config.h
+*.o
+*.swp
+*.tmp
+*~
