@@ -30,10 +30,12 @@ static const char *modes[] = {
 
 /** commands configuration **/
 
+/* alignment */
 #define LEFT        "\\l"
 #define CENTER      "\\c"
 #define RIGHT       "\\r"
 
+/* mwm */
 #define MWM_PRE     ""
 #define MWM_SUF     ""
 
@@ -51,28 +53,39 @@ static const char *modes[] = {
 #define LAYOUT_PRE  " \\u2\\b2 "
 #define LAYOUT_SUF  " \\ur\\br"
 
+/* sep */
 #define SEP_PRE     "\\u6\\b6"
 #define SEP_FMT     " | "
 #define SEP_SUF     "\\ur\\br"
 
+/* mem */
 #define MEM_PRE     "\\u3\\b3 "
 #define MEM_SUF     " \\ur\\br"
 
+/* cpu */
 #define CPU_PRE     "\\u4\\b4 "
 #define CPU_SUF     " \\ur\\br"
 
-#define TITLE_PRE   "\\u2\\b2 M \\br\\ur "
-#define TITLE_SUF   " \\f9by\\fr"
+/* mpd */
+#define MUSIC_PRE   "\\u2\\b2 M \\br\\ur "
+#define MUSIC_SUF   " "
 
-#define ARTIST_PRE  " "
-#define ARTIST_SUF  " "
+#define STOPPED_FMT "[stopped]"
 
+#define TITLE_PRE   ""
+#define TITLE_SUF   " \\f9by\\fr "
+
+#define ARTIST_PRE  ""
+#define ARTIST_SUF  ""
+
+/* vol */
 #define VOL_PRE     "\\u2\\b2 V \\br\\ur "
 #define VOL_SUF     " "
 
 #define VOL_MUTE    "Master"
 #define VOL_VOL     "PCM"
 
+/* date */
 #define DATE_PRE    "\\u2\\b2 D \\br\\ur "
 #define DATE_FMT    "%a %d/%m %R"
 #define DATE_SUF    ""
