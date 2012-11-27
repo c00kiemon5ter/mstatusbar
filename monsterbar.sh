@@ -1,11 +1,10 @@
 #!/bin/sh
 
-f=/tmp/m
-rm -f $f
-mkfifo -m600 $f
+fifo="/tmp/m"
 
-./mstatusbar < $f | bar &
+trap 'rm -f "${fifo}"' INT TERM EXIT
+[ -p "${fifo}" ] || { rm -f "${fifo}"; mkfifo -m 600 "${fifo}"; }
 
-monsterwm > $f
+mstatusbar < "${fifo}" | bar &
 
-rm -f $f
+monsterwm > "${fifo}"
