@@ -102,6 +102,8 @@ int cpu(char *buf, size_t offset, size_t rem)
 #define MPD_TIMEOUT 1000
 int mpd(char *buf, size_t offset, size_t rem)
 {
+    int r = 0;
+
     const char *host = getenv("MPD_HOST");
     const char *port = getenv("MPD_PORT");
     const char *pass = getenv("MPD_PASSWORD");
@@ -117,14 +119,21 @@ int mpd(char *buf, size_t offset, size_t rem)
         return 0;
 
     struct mpd_song *song = mpd_run_current_song(conn);
-    const char *artist = mpd_song_get_tag(song, MPD_TAG_ARTIST, 0);
-    const char *title = mpd_song_get_tag(song, MPD_TAG_TITLE, 0);
-    const char *track = mpd_song_get_tag(song, MPD_TAG_TRACK, 0);
 
-    int r = snprintf(buf + offset, rem, TITLE_PRE "%s" TITLE_SUF ARTIST_PRE "%s" ARTIST_SUF , title ? title : track, artist);
+    if (song) {
+        const char *artist = mpd_song_get_tag(song, MPD_TAG_ARTIST, 0);
+        const char *title = mpd_song_get_tag(song, MPD_TAG_TITLE, 0);
+        const char *track = mpd_song_get_tag(song, MPD_TAG_TRACK, 0);
 
-    mpd_song_free(song);
+        r = snprintf(buf + offset, rem, MUSIC_PRE TITLE_PRE "%s" TITLE_SUF ARTIST_PRE "%s" ARTIST_SUF MUSIC_SUF, title ? title : track, artist);
+
+        mpd_song_free(song);
+    }
+
     mpd_connection_free(conn);
+
+    if (!r)
+        r = snprintf(buf + offset, rem, MUSIC_PRE STOPPED_FMT MUSIC_SUF);
 
     return r;
 }
