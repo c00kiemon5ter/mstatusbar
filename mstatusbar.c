@@ -238,7 +238,7 @@ void parse_desktop_info(void)
 
 int main(void)
 {
-    while (true) {
+    for (;;) {
         char mesg[BUFSIZ];
         size_t mesglen = 0;
 
