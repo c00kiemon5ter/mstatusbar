@@ -199,11 +199,15 @@ int mwm(char *buf, size_t offset, size_t rem)
 void parse_desktop_info(void)
 {
     char line[BUFSIZ/3];
-    size_t len = 0;
+    int len = 0;
     unsigned layout = 0;
 
-    if (read(STDIN_FILENO, line, sizeof(line)) < 0)
+    if ((len = read(STDIN_FILENO, line, sizeof(line))) < 0)
         return;
+
+    if (line[len-1] == '\n')
+        line[--len] = '\0';
+    len = 0;
 
     for (char *token = strtok(line, " "); token; token = strtok(NULL, " ")) {
         unsigned deskid = 0, nwins = 0, deskmode = 0, deskcur = 0, deskurg = 0;
@@ -214,7 +218,7 @@ void parse_desktop_info(void)
                     &deskid, &nwins, &deskmode, &deskcur, &deskurg) == 7) {
 
             if (moncur && deskcur)
-                layout = ++deskmode;
+                layout = deskmode;
 
             len += snprintf(desktops + len, sizeof(desktops) - len, "%s%s" DESKTOP_PRE "%s%s" WINDOW_PRE "%u" WINDOW_SUF DESKTOP_SUF,
                     deskcur && moncur ? DESKTOP_CUR : deskcur ? DESKTOP_UNF : "",
@@ -227,7 +231,7 @@ void parse_desktop_info(void)
                     &deskid, &nwins, &deskmode, &deskcur, &deskurg) == 5) {
 
             if (deskcur)
-                layout = ++deskmode;
+                layout = deskmode;
 
             len += snprintf(desktops + len, sizeof(desktops) - len, "%s%s" DESKTOP_PRE "%s%s" WINDOW_PRE "%u" WINDOW_SUF DESKTOP_SUF,
                     deskcur ? DESKTOP_CUR : deskcur ? DESKTOP_UNF : "",
@@ -236,13 +240,12 @@ void parse_desktop_info(void)
                     nwins ? "" : WINDOW_ZER,
                     nwins);
 #endif
-        } else { /* last token will always fail */
-            if (layout--)
-                snprintf(desktops + len, sizeof(desktops) - len, LAYOUT_PRE "%s" LAYOUT_SUF, modes[layout]);
-
+        } else {
             return;
         }
     }
+
+    snprintf(desktops + len, sizeof(desktops) - len, LAYOUT_PRE "%s" LAYOUT_SUF, modes[layout]);
 }
 
 int main(void)
