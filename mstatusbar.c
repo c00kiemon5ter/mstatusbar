@@ -220,7 +220,7 @@ int vol(char *buf, size_t offset, size_t rem)
     if (handle)
         snd_mixer_close(handle);
 
-    return snprintf(buf + offset, rem, VOL_PRE "%ld%%" VOL_SUF, !!mute * (vol*100)/max);
+    return snprintf(buf + offset, rem, VOL_ICO VOL_PRE "%ld%%" VOL_SUF, !!mute * (vol*100)/max);
 }
 
 int date(char *buf, size_t offset, size_t rem)
@@ -231,7 +231,7 @@ int date(char *buf, size_t offset, size_t rem)
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 
-    return strftime(buf + offset, rem, DATE_PRE DATE_FMT DATE_SUF, timeinfo);
+    return strftime(buf + offset, rem, DATE_ICO DATE_PRE DATE_FMT DATE_SUF, timeinfo);
 }
 
 int mwm(char *buf, size_t offset, size_t rem)
