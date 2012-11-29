@@ -110,7 +110,7 @@ int cpu(char *buf, size_t offset, size_t rem)
     }
 
     if (mhz)
-        r = snprintf(buf + offset, rem, CPU_PRE "CPU: %lf mhz" CPU_SUF, mhz/1024);
+        r = snprintf(buf + offset, rem, CPU_ICO CPU_PRE "%lf" CPU_SUF, mhz/1024);
 
     if (line)
         free(line);
