@@ -118,6 +118,30 @@ int cpu(char *buf, size_t offset, size_t rem)
     return r;
 }
 
+int ddbf(char *buf, size_t offset, size_t rem)
+{
+    int r = 0;
+#if DDBF
+    const char cmd[] = "deadbeef --nowplaying '"DDBF_FMT"'";
+    char rsp[BUFSIZ/3];
+
+    FILE *fp = popen(cmd, "r");
+
+    if (!fp)
+        return 0;
+
+    if (!fgets(rsp, sizeof(rsp), fp)) {
+        pclose(fp);
+        return 0;
+    }
+
+    r = snprintf(buf + offset, rem, MUSIC_ICO MUSIC_PRE DDBF_PRE "%s" DDBF_SUF MUSIC_SUF, rsp);
+
+    pclose(fp);
+#endif
+    return r;
+}
+
 #define MPD_TIMEOUT 1000
 int mpd(char *buf, size_t offset, size_t rem)
 {
