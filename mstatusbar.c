@@ -36,12 +36,12 @@ int sep(char *buf, size_t offset, size_t rem)
     return snprintf(buf + offset, rem, SEP_PRE SEP_FMT SEP_SUF);
 }
 
-int mem(char *buf, size_t offset, size_t rem)
+int total_mem(char *buf, size_t offset, size_t rem)
 {
     int r = 0;
+    unsigned long value = 0;
 
     FILE *fp = fopen(MEM_INFO, "r");
-
     if (!fp)
         return 0;
 
@@ -49,19 +49,38 @@ int mem(char *buf, size_t offset, size_t rem)
     size_t len = 0;
     ssize_t read = 0;
 
-    unsigned long total = 0;
-    unsigned long cache = 0;
-
-    while (!(total && cache) && (read = getline(&line, &len, fp)) != -1) {
-        unsigned long value = 0;
+    while ((read = getline(&line, &len, fp)) != -1) {
         if (sscanf(line, "MemTotal: %lu kB", &value) == 1)
-            total = value;
-        else if (sscanf(line, "MemFree: %lu kB", &value) == 1)
-            cache = value;
+            break;
     }
 
-    if (total && cache)
-        r = snprintf(buf + offset, rem, MEM_PRE "Mem: %lu Mb of %lu Mb" MEM_SUF, cache/1024, total/1024);
+    r = snprintf(buf + offset, rem, MEM_TOTAL_ICO MEM_TOTAL_PRE "%lu" MEM_TOTAL_SUF, value/1024);
+
+    if (line)
+        free(line);
+
+    return r;
+}
+
+int free_mem(char *buf, size_t offset, size_t rem)
+{
+    int r = 0;
+    unsigned long value = 0;
+
+    FILE *fp = fopen(MEM_INFO, "r");
+    if (!fp)
+        return 0;
+
+    char *line = 0;
+    size_t len = 0;
+    ssize_t read = 0;
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+        if (sscanf(line, "MemFree: %lu kB", &value) == 1)
+            break;
+    }
+
+    r = snprintf(buf + offset, rem, MEM_FREE_ICO MEM_FREE_PRE "%lu" MEM_FREE_SUF, value/1024);
 
     if (line)
         free(line);
