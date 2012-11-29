@@ -12,6 +12,11 @@
 #include <alsa/asoundlib.h>
 #include <mpd/client.h>
 
+#if BATT
+#include <dev/acpica/acpiio.h>
+#include <sys/ioctl.h>
+#endif
+
 #include "config.h"
 
 static char desktops[BUFSIZ/3];
@@ -177,6 +182,32 @@ int mpd(char *buf, size_t offset, size_t rem)
 
     if (!r)
         r = snprintf(buf + offset, rem, MUSIC_PRE STOPPED_FMT MUSIC_SUF);
+    return r;
+}
+
+#define ACPI_DEV    "/dev/acpi"
+int batt(char *buf, size_t offset, size_t rem)
+{
+    int r = 0;
+
+#if BATT
+    int fd = open(ACPI_DEV, O_RDONLY);
+    if (fd == -1)
+        return 0;
+
+    union acpi_battery_ioctl_arg battio;
+    battio.unit = ACPI_BATTERY_ALL_UNITS;
+
+    if (ioctl(fd, ACPIIO_BATT_GET_BATTINFO, &battio) != -1 && battio.battinfo.cap != -1) {
+        r = snprintf(buf + offset, rem, BATT_ICO BATT_PRE "%s" BUT_SUF,
+                battio.battinfo.state == 0                         ? BATT_NORM :
+                battio.battinfo.state & ACPI_BATT_STAT_CRITICAL    ? BATT_CRIT :
+                battio.battinfo.state & ACPI_BATT_STAT_DISCHARGING ? BATT_DISC :
+                battio.battinfo.state & ACPI_BATT_STAT_CHARGING    ? BATT_CHAR : BATT_UNKN);
+    }
+
+    close(fd);
+#endif
 
     return r;
 }
