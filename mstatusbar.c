@@ -44,6 +44,7 @@ int sep(char *buf, size_t offset, size_t rem)
     return snprintf(buf + offset, rem, SEP_PRE SEP_FMT SEP_SUF);
 }
 
+#define MEM_INFO    "/proc/meminfo"
 int total_mem(char *buf, size_t offset, size_t rem)
 {
     int r = 0;
@@ -96,6 +97,7 @@ int free_mem(char *buf, size_t offset, size_t rem)
     return r;
 }
 
+#define CPU_INFO    "/proc/cpuinfo"
 int cpu(char *buf, size_t offset, size_t rem)
 {
     int r = 0;
