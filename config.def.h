@@ -16,6 +16,8 @@ static int free_mem(char *, size_t, size_t);
 static int cpu(char *, size_t, size_t);
 static int ddbf(char *, size_t, size_t);
 static int mpd(char *, size_t, size_t);
+static int batt_state(char *, size_t, size_t);
+static int batt_perc(char *, size_t, size_t);
 static int vol(char *, size_t, size_t);
 static int date(char *, size_t, size_t);
 
@@ -97,18 +99,6 @@ static const char *modes[] = {
 #define ARTIST_PRE  ""
 #define ARTIST_SUF  ""
 
-/* batt */
-#define BATT_ICO   "\\u2\\b2 B \\br\\ur"
-
-#define BATT_PRE    " "
-#define BATT_SUF    " "
-
-#define BATT_NORM   "="
-#define BATT_CRIT   "!"
-#define BATT_CHAR   "+"
-#define BATT_DISC   "-"
-#define BATT_UNKN   "?"
-
 /* vol */
 #define VOL_ICO     "\\u2\\b2 V \\br\\ur"
 #define VOL_PRE     " "
@@ -117,6 +107,22 @@ static const char *modes[] = {
 #define MUTE_FMT    "[m]"
 #define VOL_MUTE    "Master"
 #define VOL_VOL     "PCM"
+
+/* batt state */
+#define BATT_ST_ICO  "\\u2\\b2 B \\br\\ur"
+#define BATT_ST_PRE  " "
+#define BATT_ST_SUF  " "
+
+#define BATT_ST_NORM "="
+#define BATT_ST_CRIT "!"
+#define BATT_ST_CHAR "+"
+#define BATT_ST_DISC "-"
+#define BATT_ST_UNKN "?"
+
+/* bat perc */
+#define BATT_ICO    ""
+#define BATT_PRE    " "
+#define BATT_SUF    " "
 
 /* date */
 #define DATE_ICO    "\\u2\\b2 D \\br\\ur"
@@ -140,6 +146,8 @@ static int (* const funcs[])(char *buf, size_t rem, size_t offset) = {
     ddbf,
     mpd,
     vol,
+    batt_state,
+    batt_perc,
     date,
 };
 

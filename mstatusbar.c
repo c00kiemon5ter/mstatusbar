@@ -193,7 +193,7 @@ int mpd(char *buf, size_t offset, size_t rem)
 }
 
 #define ACPI_DEV    "/dev/acpi"
-int batt(char *buf, size_t offset, size_t rem)
+int batt_state(char *buf, size_t offset, size_t rem)
 {
     int r = 0;
 
@@ -206,11 +206,33 @@ int batt(char *buf, size_t offset, size_t rem)
     battio.unit = ACPI_BATTERY_ALL_UNITS;
 
     if (ioctl(fd, ACPIIO_BATT_GET_BATTINFO, &battio) != -1 && battio.battinfo.cap != -1) {
-        r = snprintf(buf + offset, rem, BATT_ICO BATT_PRE "%s" BUT_SUF,
-                battio.battinfo.state == 0                         ? BATT_NORM :
-                battio.battinfo.state & ACPI_BATT_STAT_CRITICAL    ? BATT_CRIT :
-                battio.battinfo.state & ACPI_BATT_STAT_DISCHARGING ? BATT_DISC :
-                battio.battinfo.state & ACPI_BATT_STAT_CHARGING    ? BATT_CHAR : BATT_UNKN);
+        r = snprintf(buf + offset, rem, BATT_ST_ICO BATT_ST_PRE "%s" BUT_ST_SUF,
+                battio.battinfo.state == 0                         ? BATT_ST_NORM :
+                battio.battinfo.state & ACPI_BATT_STAT_CRITICAL    ? BATT_ST_CRIT :
+                battio.battinfo.state & ACPI_BATT_STAT_DISCHARGING ? BATT_ST_DISC :
+                battio.battinfo.state & ACPI_BATT_STAT_CHARGING    ? BATT_ST_CHAR : BATT_ST_UNKN);
+    }
+
+    close(fd);
+#endif
+
+    return r;
+}
+
+int batt_perc(char *buf, size_t offset, size_t rem)
+{
+    int r = 0;
+
+#if BATT
+    int fd = open(ACPI_DEV, O_RDONLY);
+    if (fd == -1)
+        return 0;
+
+    union acpi_battery_ioctl_arg battio;
+    battio.unit = ACPI_BATTERY_ALL_UNITS;
+
+    if (ioctl(fd, ACPIIO_BATT_GET_BATTINFO, &battio) != -1 && battio.battinfo.cap != -1) {
+        r = snprintf(buf + offset, rem, BATT_ICO BATT_PRE "%s" BUT_SUF, battio.battinfo.cap
     }
 
     close(fd);
