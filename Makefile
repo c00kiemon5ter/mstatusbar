@@ -8,12 +8,20 @@ ALSALIB = -lasound
 MPDLIB  = -lmpdclient
 
 INCS = -I. -I/usr/include
-LIBS = -L/usr/lib -lc ${ALSALIB} ${MPDLIB}
+LIBS = -L/usr/lib -lc ${ALSALIB}
 
 XINERAMA ?= 0
+MPD		 ?= 0
+DDBF	 ?= 0
+BATT	 ?= 0
 
-CFLAGS   = -std=c99 -pedantic -Wall -Wextra -DXINERAMA=${XINERAMA}
+CFLAGS   = -std=c99 ${INCS}
+CFLAGS  += -DXINERAMA=${XINERAMA} -DMPD=${MPD} -DDDBF=${DDBF} -DBATT=${BATT}
 LDFLAGS  = ${LIBS}
+
+ifeq "$(MPD)" "1"
+	LIBS += ${MPDLIB}
+endif
 
 CC 	 = cc
 EXEC = mstatusbar
@@ -25,7 +33,7 @@ all: CFLAGS += -Os
 all: LDFLAGS += -s
 all: mstatusbar
 
-debug: CFLAGS += -O0 -g
+debug: CFLAGS += -O0 -g -pedantic -Wall -Wextra
 debug: options mstatusbar
 
 options:
