@@ -10,7 +10,10 @@
 #include <unistd.h>
 
 #include <alsa/asoundlib.h>
+
+#if MPD
 #include <mpd/client.h>
+#endif
 
 #if BATT
 #include <dev/acpica/acpiio.h>
@@ -152,6 +155,7 @@ int mpd(char *buf, size_t offset, size_t rem)
 {
     int r = 0;
 
+#if MPD
     const char *host = getenv("MPD_HOST");
     const char *port = getenv("MPD_PORT");
     const char *pass = getenv("MPD_PASSWORD");
@@ -173,7 +177,8 @@ int mpd(char *buf, size_t offset, size_t rem)
         const char *title = mpd_song_get_tag(song, MPD_TAG_TITLE, 0);
         const char *track = mpd_song_get_tag(song, MPD_TAG_TRACK, 0);
 
-        r = snprintf(buf + offset, rem, MUSIC_PRE TITLE_PRE "%s" TITLE_SUF ARTIST_PRE "%s" ARTIST_SUF MUSIC_SUF, title ? title : track, artist);
+        r = snprintf(buf + offset, rem, MUSIC_ICO MUSIC_PRE MPD_PRE TITLE_PRE "%s" TITLE_SUF ARTIST_PRE "%s" ARTIST_SUF MPD_SUF MUSIC_SUF,
+                title ? title : track, artist);
 
         mpd_song_free(song);
     }
@@ -182,6 +187,8 @@ int mpd(char *buf, size_t offset, size_t rem)
 
     if (!r)
         r = snprintf(buf + offset, rem, MUSIC_PRE STOPPED_FMT MUSIC_SUF);
+#endif
+
     return r;
 }
 
