@@ -19,7 +19,7 @@ CFLAGS   = -std=c99 ${INCS}
 CFLAGS  += -DXINERAMA=${XINERAMA} -DMPD=${MPD} -DDDBF=${DDBF} -DBATT=${BATT}
 LDFLAGS  = ${LIBS}
 
-ifeq "$(MPD)" "1"
+ifneq "$(MPD)" "0"
 	LIBS += ${MPDLIB}
 endif
 
