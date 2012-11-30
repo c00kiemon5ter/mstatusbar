@@ -143,7 +143,7 @@ int ddbf(char *buf, size_t offset, size_t rem)
         return 0;
     }
 
-    r = snprintf(buf + offset, rem, MUSIC_ICO MUSIC_PRE DDBF_PRE "%s" DDBF_SUF MUSIC_SUF, rsp);
+    r = snprintf(buf + offset, rem, DDBF_ICO DDBF_PRE "%s" DDBF_SUF, rsp);
 
     pclose(fp);
 #endif
@@ -170,26 +170,40 @@ int mpd(char *buf, size_t offset, size_t rem)
     if (pass && !mpd_run_password(conn, pass))
         return 0;
 
-    struct mpd_song *song = mpd_run_current_song(conn);
+    r += snprintf(buf + offset + r, rem - r, MPD_ICO MPD_PRE);
 
+    /* mpd state */
+    struct mpd_status *status = mpd_run_status(conn);
+    if (status) {
+        const enum mpd_state state = mpd_status_get_state(status);
+
+        r += snprintf(buf + offset + r, rem - r, MPD_STATE_ICO MPD_STATE_PRE "%s" MPD_STATE_SUF,
+                state == MPD_STATE_PLAY ? MPD_PLAYING :
+                state == MPD_STATE_STOP ? MPD_STOPPED :
+                state == MPD_STATE_PAUSE ? MPD_PAUSED : MPD_UNKNOWN);
+    }
+
+    /* mpd song */
+    struct mpd_song *song = mpd_run_current_song(conn);
     if (song) {
         const char *artist = mpd_song_get_tag(song, MPD_TAG_ARTIST, 0);
         const char *title = mpd_song_get_tag(song, MPD_TAG_TITLE, 0);
-        const char *track = mpd_song_get_tag(song, MPD_TAG_TRACK, 0);
 
-        r = snprintf(buf + offset, rem, MUSIC_ICO MUSIC_PRE MPD_PRE TITLE_PRE "%s" TITLE_SUF ARTIST_PRE "%s" ARTIST_SUF MPD_SUF MUSIC_SUF,
-                title ? title : track, artist);
+        r += snprintf(buf + offset + r, rem - r, TITLE_ICO  TITLE_PRE  "%s" TITLE_SUF,  title);
+        r += snprintf(buf + offset + r, rem - r, ARTIST_ICO ARTIST_PRE "%s" ARTIST_SUF, artist);
 
         mpd_song_free(song);
     }
 
-    mpd_connection_free(conn);
+    r += snprintf(buf + offset + r, rem - r, MPD_SUF);
 
-    if (!r)
-        r = snprintf(buf + offset, rem, MUSIC_PRE STOPPED_FMT MUSIC_SUF);
+    mpd_connection_free(conn);
 #endif
 
-    return r;
+    if (status || song)
+        return r;
+    else
+        return 0;
 }
 
 #define ACPI_DEV    "/dev/acpi"
@@ -207,10 +221,10 @@ int batt_state(char *buf, size_t offset, size_t rem)
 
     if (ioctl(fd, ACPIIO_BATT_GET_BATTINFO, &battio) != -1 && battio.battinfo.cap != -1) {
         r = snprintf(buf + offset, rem, BATT_ST_ICO BATT_ST_PRE "%s" BUT_ST_SUF,
-                battio.battinfo.state == 0                         ? BATT_ST_NORM :
-                battio.battinfo.state & ACPI_BATT_STAT_CRITICAL    ? BATT_ST_CRIT :
-                battio.battinfo.state & ACPI_BATT_STAT_DISCHARGING ? BATT_ST_DISC :
-                battio.battinfo.state & ACPI_BATT_STAT_CHARGING    ? BATT_ST_CHAR : BATT_ST_UNKN);
+                battio.battinfo.state == 0                         ? BATT_NORMAL    :
+                battio.battinfo.state & ACPI_BATT_STAT_CRITICAL    ? BATT_CRITICAL  :
+                battio.battinfo.state & ACPI_BATT_STAT_DISCHARGING ? BATT_DISCHARGE :
+                battio.battinfo.state & ACPI_BATT_STAT_CHARGING    ? BATT_CHARGE    : BATT_UNKNOWN);
     }
 
     close(fd);
@@ -256,7 +270,7 @@ int vol(char *buf, size_t offset, size_t rem)
     /* init channel with volume info */
     snd_mixer_selem_id_t *vol_id;
     snd_mixer_selem_id_malloc(&vol_id);
-    snd_mixer_selem_id_set_name(vol_id, VOL_VOL);
+    snd_mixer_selem_id_set_name(vol_id, VOL_CHAN);
     snd_mixer_elem_t* pcm_mixer = snd_mixer_find_selem(handle, vol_id);
 
     /* get volume */
@@ -266,7 +280,7 @@ int vol(char *buf, size_t offset, size_t rem)
     /* init channel with mute info */
     snd_mixer_selem_id_t *mute_id;
     snd_mixer_selem_id_malloc(&mute_id);
-    snd_mixer_selem_id_set_name(mute_id, VOL_MUTE);
+    snd_mixer_selem_id_set_name(mute_id, MUTE_CHAN);
     snd_mixer_elem_t* mas_mixer = snd_mixer_find_selem(handle, mute_id);
 
     /* get mute state */
