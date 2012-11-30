@@ -89,7 +89,7 @@ static const char *modes[] = {
 /* mpd */
 #define MPD_ICO         "\\u2\\b2 M \\ur\\br"
 #define MPD_PRE         ""
-#define MPD_SUF         ""
+#define MPD_SUF         " "
 
 /* mpd state */
 #define MPD_STATE_ICO   ""
@@ -102,13 +102,13 @@ static const char *modes[] = {
 #define MPD_UNKNOWN     "\\u5\\b5 ? \\ur\\br"
 
 /* mpd tags */
-#define TITLE_ICO       ""
-#define TITLE_PRE       " "
-#define TITLE_SUF       " "
+#define TITLE_ICO       " "
+#define TITLE_PRE       ""
+#define TITLE_SUF       ""
 
-#define ARTIST_ICO      "\\f9by\\fr"
-#define ARTIST_PRE      " "
-#define ARTIST_SUF      " "
+#define ARTIST_ICO      " \\f9by\\fr "
+#define ARTIST_PRE      ""
+#define ARTIST_SUF      ""
 
 /* batt state */
 #define BATT_ST_ICO     "\\u2\\b2 B \\ur\\br"
