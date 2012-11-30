@@ -1,7 +1,13 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define TIMEOUT     5   /* seconds */
+/* how often in seconds to run the commands */
+#define TIMEOUT     5
+
+#define MEM_INFO    "/proc/meminfo"
+#define CPU_INFO    "/proc/cpuinfo"
+#define ACPI_DEV    "/dev/acpi"
+#define MPD_TIMEOUT 1000
 
 /* alignment commands */
 static int align_l(char *, size_t, size_t);

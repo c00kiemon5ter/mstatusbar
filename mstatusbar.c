@@ -1,4 +1,4 @@
-#define _POSIX_C_SOURCE 200809L /* or #define _XOPEN_SOURCE 700 */
+#define _POSIX_C_SOURCE 200809L /* or _XOPEN_SOURCE 700 */
 #define LENGTH(x)       (sizeof(x) / sizeof(*x))
 
 #include <stdint.h>
@@ -150,7 +150,6 @@ int ddbf(char *buf, size_t offset, size_t rem)
     return r;
 }
 
-#define MPD_TIMEOUT 1000
 int mpd(char *buf, size_t offset, size_t rem)
 {
     int r = 0;
@@ -206,7 +205,6 @@ int mpd(char *buf, size_t offset, size_t rem)
         return 0;
 }
 
-#define ACPI_DEV    "/dev/acpi"
 int batt_state(char *buf, size_t offset, size_t rem)
 {
     int r = 0;
