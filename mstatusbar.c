@@ -133,8 +133,9 @@ int cpu(char *buf, size_t offset, size_t rem)
 
 int ddbf(char *buf, size_t offset, size_t rem)
 {
-    int r = 0;
 #if DDBF
+    int r = 0;
+
     const char cmd[] = "deadbeef --nowplaying '"DDBF_FMT"'";
     char rsp[BUFSIZ/3];
 
@@ -152,14 +153,15 @@ int ddbf(char *buf, size_t offset, size_t rem)
 
     pclose(fp);
 #endif
-    return r;
+
+    return 0;
 }
 
 int mpd(char *buf, size_t offset, size_t rem)
 {
+#if MPD
     int r = 0;
 
-#if MPD
     const char *host = getenv("MPD_HOST");
     const char *port = getenv("MPD_PORT");
     const char *pass = getenv("MPD_PASSWORD");
@@ -202,12 +204,12 @@ int mpd(char *buf, size_t offset, size_t rem)
     r += snprintf(buf + offset + r, rem - r, MPD_SUF);
 
     mpd_connection_free(conn);
-#endif
 
     if (status || song)
         return r;
-    else
-        return 0;
+#endif
+
+    return 0;
 }
 
 int batt_state(char *buf, size_t offset, size_t rem)
