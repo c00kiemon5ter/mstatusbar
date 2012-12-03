@@ -218,18 +218,14 @@ int batt_state(char *buf, size_t offset, size_t rem)
     if (!fp)
         return 0;
 
-    char *line = 0;
-    size_t len = 0;
-    ssize_t read = 0;
+    char line[BUFSIZ/3];
 
-    if ((read = getline(&line, &len, fp)) != -1)
+    if (fscanf(fp, "%s", line) == 1)
         r = snprintf(buf + offset, rem, BATT_STATE_ICO BATT_STATE_PRE "%s" BATT_STATE_SUF,
                 !strcmp(line, "Discharging") ? BATT_DISCHARGE :
                 !strcmp(line, "Charging")    ? BATT_CHARGE    :
                 !strcmp(line, "Full")        ? BATT_FULL      : BATT_UNKNOWN);
 
-    if (line)
-        free(line);
     fclose(fp);
 #endif
 
@@ -251,8 +247,7 @@ int batt_perc(char *buf, size_t offset, size_t rem)
 
     /* FIXME battery percent */
     if (fscanf(ffp, "%ld", &cap_full) == 1 && fscanf(cfp, "%ld", &cap_now) == 1)
-        r = snprintf(buf + offset, rem, BATT_ICO BATT_PRE "%ld" BATT_SUF,
-                (cap_now * 100) / cap_full);
+        r = snprintf(buf + offset, rem, BATT_ICO BATT_PRE "%ld" BATT_SUF, (cap_now * 100L) / cap_full);
 
     fclose(ffp);
     fclose(cfp);

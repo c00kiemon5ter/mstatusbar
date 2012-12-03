@@ -115,18 +115,18 @@ static const char *modes[] = {
 
 /* batt state */
 #define BATT_STATE_ICO  "\\u2\\b2 B \\ur\\br"
-#define BATT_STATE_PRE  " "
-#define BATT_STATE_SUF  " "
+#define BATT_STATE_PRE  ""
+#define BATT_STATE_SUF  ""
 
-#define BATT_FULL       "="
-#define BATT_CHARGE     "+"
-#define BATT_DISCHARGE  "-"
-#define BATT_UNKNOWN    "?"
+#define BATT_FULL       "\\f3 = \\fr"
+#define BATT_CHARGE     "\\f2 + \\fr"
+#define BATT_DISCHARGE  "\\f7 - \\fr"
+#define BATT_UNKNOWN    "\\f1 ? \\fr"
 
 /* bat perc */
-#define BATT_ICO        ""
+#define BATT_ICO        "\\f4"
 #define BATT_PRE        " "
-#define BATT_SUF        "% "
+#define BATT_SUF        "%\\fr "
 
 /* vol */
 #define VOL_ICO         "\\u2\\b2 V \\ur\\br"
