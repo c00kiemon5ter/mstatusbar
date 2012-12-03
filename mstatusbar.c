@@ -15,11 +15,6 @@
 #include <mpd/client.h>
 #endif
 
-#if BATT
-#include <dev/acpica/acpiio.h>
-#include <sys/ioctl.h>
-#endif
-
 #include "config.h"
 
 static char desktops[BUFSIZ/3];
@@ -66,6 +61,7 @@ int total_mem(char *buf, size_t offset, size_t rem)
 
     if (line)
         free(line);
+    fclose(fp);
 
     return r;
 }
@@ -97,6 +93,7 @@ int free_mem(char *buf, size_t offset, size_t rem)
 
     if (line)
         free(line);
+    fclose(fp);
 
     return r;
 }
@@ -106,7 +103,6 @@ int cpu(char *buf, size_t offset, size_t rem)
     int r = 0;
 
     FILE *fp = fopen(CPU_INFO, "r");
-
     if (!fp)
         return 0;
 
@@ -127,6 +123,7 @@ int cpu(char *buf, size_t offset, size_t rem)
 
     if (line)
         free(line);
+    fclose(fp);
 
     return r;
 }
@@ -217,22 +214,23 @@ int batt_state(char *buf, size_t offset, size_t rem)
     int r = 0;
 
 #if BATT
-    int fd = open(ACPI_DEV, O_RDONLY);
-    if (fd == -1)
+    FILE *fp = fopen(BATT_STATE, "r");
+    if (!fp)
         return 0;
 
-    union acpi_battery_ioctl_arg battio;
-    battio.unit = ACPI_BATTERY_ALL_UNITS;
+    char *line = 0;
+    size_t len = 0;
+    ssize_t read = 0;
 
-    if (ioctl(fd, ACPIIO_BATT_GET_BATTINFO, &battio) != -1 && battio.battinfo.cap != -1) {
-        r = snprintf(buf + offset, rem, BATT_ST_ICO BATT_ST_PRE "%s" BUT_ST_SUF,
-                battio.battinfo.state == 0                         ? BATT_NORMAL    :
-                battio.battinfo.state & ACPI_BATT_STAT_CRITICAL    ? BATT_CRITICAL  :
-                battio.battinfo.state & ACPI_BATT_STAT_DISCHARGING ? BATT_DISCHARGE :
-                battio.battinfo.state & ACPI_BATT_STAT_CHARGING    ? BATT_CHARGE    : BATT_UNKNOWN);
-    }
+    if ((read = getline(&line, &len, fp)) != -1)
+        r = snprintf(buf + offset, rem, BATT_STATE_ICO BATT_STATE_PRE "%s" BATT_STATE_SUF,
+                !strcmp(line, "Discharging") ? BATT_DISCHARGE :
+                !strcmp(line, "Charging")    ? BATT_CHARGE    :
+                !strcmp(line, "Full")        ? BATT_FULL      : BATT_UNKNOWN);
 
-    close(fd);
+    if (line)
+        free(line);
+    fclose(fp);
 #endif
 
     return r;
@@ -243,18 +241,21 @@ int batt_perc(char *buf, size_t offset, size_t rem)
     int r = 0;
 
 #if BATT
-    int fd = open(ACPI_DEV, O_RDONLY);
-    if (fd == -1)
+    FILE *ffp = fopen(BATT_CAP_FULL, "r");
+    FILE *cfp = fopen(BATT_CAP_CHARGE, "r");
+    if (!ffp || !cfp)
         return 0;
 
-    union acpi_battery_ioctl_arg battio;
-    battio.unit = ACPI_BATTERY_ALL_UNITS;
+    long cap_full = 0;
+    long cap_now = 0;
 
-    if (ioctl(fd, ACPIIO_BATT_GET_BATTINFO, &battio) != -1 && battio.battinfo.cap != -1) {
-        r = snprintf(buf + offset, rem, BATT_ICO BATT_PRE "%s" BUT_SUF, battio.battinfo.cap
-    }
+    /* FIXME battery percent */
+    if (fscanf(ffp, "%ld", &cap_full) == 1 && fscanf(cfp, "%ld", &cap_now) == 1)
+        r = snprintf(buf + offset, rem, BATT_ICO BATT_PRE "%ld" BATT_SUF,
+                (cap_now * 100) / cap_full);
 
-    close(fd);
+    fclose(ffp);
+    fclose(cfp);
 #endif
 
     return r;

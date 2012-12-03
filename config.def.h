@@ -4,10 +4,13 @@
 /* how often in seconds to run the commands */
 #define TIMEOUT     5
 
-#define MEM_INFO    "/proc/meminfo"
-#define CPU_INFO    "/proc/cpuinfo"
-#define ACPI_DEV    "/dev/acpi"
-#define MPD_TIMEOUT 1000
+#define MEM_INFO        "/proc/meminfo"
+#define CPU_INFO        "/proc/cpuinfo"
+#define ACPI_DEV        "/dev/acpi"
+#define BATT_STATE      "/sys/class/power_supply/BAT0/status"
+#define BATT_CAP_FULL   "/sys/class/power_supply/BAT0/charge_full"
+#define BATT_CAP_CHARGE "/sys/class/power_supply/BAT0/charge_now"
+#define MPD_TIMEOUT     1000
 
 /* alignment commands */
 static int align_l(char *, size_t, size_t);
@@ -111,13 +114,12 @@ static const char *modes[] = {
 #define ARTIST_SUF      ""
 
 /* batt state */
-#define BATT_ST_ICO     "\\u2\\b2 B \\ur\\br"
-#define BATT_ST_PRE     " "
-#define BATT_ST_SUF     " "
+#define BATT_STATE_ICO  "\\u2\\b2 B \\ur\\br"
+#define BATT_STATE_PRE  " "
+#define BATT_STATE_SUF  " "
 
-#define BATT_NORMAL     "="
-#define BATT_CRITICAL   "!"
-#define BATT_CHARE      "+"
+#define BATT_FULL       "="
+#define BATT_CHARGE     "+"
 #define BATT_DISCHARGE  "-"
 #define BATT_UNKNOWN    "?"
 
