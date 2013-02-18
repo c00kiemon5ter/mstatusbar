@@ -17,6 +17,7 @@ BATT	 ?= 0
 
 CFLAGS   = -std=c99 ${INCS}
 CFLAGS  += -DXINERAMA=${XINERAMA} -DMPD=${MPD} -DDDBF=${DDBF} -DBATT=${BATT}
+CFLAGS  += -Du_int8_t=uint8_t -Du_int16_t=uint16_t -Du_int32_t=uint32_t -Du_int64_t=uint64_t
 LDFLAGS  = ${LIBS}
 
 ifneq "$(MPD)" "0"
